@@ -1,34 +1,30 @@
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-import {sign, recoverPubKey, verify, calcPubKeyRecoveryParam} from "./ecdsa";
-import {sha256} from "./hash";
-import {getCurveByName} from "ecurve";
-var secp256k1 = getCurveByName("secp256k1");
+import { sign, recoverPubKey, verify, calcPubKeyRecoveryParam } from './ecdsa';
+import { sha256 } from './hash';
+import { getCurveByName } from 'ecurve';
+var secp256k1 = getCurveByName('secp256k1');
 import assert from "assert";
-import BigInteger from "bigi";
-import PublicKey from "./PublicKey";
+import BigInteger from 'bigi';
+import PublicKey from './PublicKey';
 
-var Signature = (function() {
+var Signature = function () {
     function Signature(r1, s1, i1) {
         _classCallCheck(this, Signature);
 
         this.r = r1;
         this.s = s1;
         this.i = i1;
-        assert.equal(this.r != null, true, "Missing parameter");
-        assert.equal(this.s != null, true, "Missing parameter");
-        assert.equal(this.i != null, true, "Missing parameter");
+        assert.equal(this.r != null, true, 'Missing parameter');
+        assert.equal(this.s != null, true, 'Missing parameter');
+        assert.equal(this.i != null, true, 'Missing parameter');
     }
 
     Signature.fromBuffer = function fromBuffer(buf) {
         var i, r, s;
-        assert.equal(buf.length, 65, "Invalid signature length");
+        assert.equal(buf.length, 65, 'Invalid signature length');
         i = buf.readUInt8(0);
-        assert.equal(i - 27, (i - 27) & 7, "Invalid signature parameter");
+        assert.equal(i - 27, i - 27 & 7, 'Invalid signature parameter');
         r = BigInteger.fromBuffer(buf.slice(1, 33));
         s = BigInteger.fromBuffer(buf.slice(33));
         return new Signature(r, s, i);
@@ -43,18 +39,14 @@ var Signature = (function() {
         return buf;
     };
 
-    Signature.prototype.recoverPublicKeyFromBuffer = function recoverPublicKeyFromBuffer(
-        buffer
-    ) {
+    Signature.prototype.recoverPublicKeyFromBuffer = function recoverPublicKeyFromBuffer(buffer) {
         return this.recoverPublicKey(sha256(buffer));
     };
 
     /**
         @return {PublicKey}
     */
-    Signature.prototype.recoverPublicKey = function recoverPublicKey(
-        sha256_buffer
-    ) {
+    Signature.prototype.recoverPublicKey = function recoverPublicKey(sha256_buffer) {
         var Q = void 0,
             e = void 0,
             i = void 0;
@@ -82,12 +74,9 @@ var Signature = (function() {
         @return {Signature}
     */
 
-    Signature.signBufferSha256 = function signBufferSha256(
-        buf_sha256,
-        private_key
-    ) {
-        if (buf_sha256.length !== 32 || !Buffer.isBuffer(buf_sha256))
-            throw new Error("buf_sha256: 32 byte buffer requred");
+
+    Signature.signBufferSha256 = function signBufferSha256(buf_sha256, private_key) {
+        if (buf_sha256.length !== 32 || !Buffer.isBuffer(buf_sha256)) throw new Error("buf_sha256: 32 byte buffer requred");
         var der, e, ecsignature, i, lenR, lenS, nonce;
         i = null;
         nonce = 0;
@@ -98,20 +87,13 @@ var Signature = (function() {
             lenR = der[3];
             lenS = der[5 + lenR];
             if (lenR === 32 && lenS === 32) {
-                i = calcPubKeyRecoveryParam(
-                    secp256k1,
-                    e,
-                    ecsignature,
-                    private_key.toPublicKey().Q
-                );
+                i = calcPubKeyRecoveryParam(secp256k1, e, ecsignature, private_key.toPublicKey().Q);
                 i += 4; // compressed
                 i += 27; // compact  //  24 or 27 :( forcing odd-y 2nd key candidate)
                 break;
             }
             if (nonce % 10 === 0) {
-                console.log(
-                    "WARN: " + nonce + " attempts to find canonical signature"
-                );
+                console.log("WARN: " + nonce + " attempts to find canonical signature");
             }
         }
         return new Signature(ecsignature.r, ecsignature.s, i);
@@ -132,30 +114,18 @@ var Signature = (function() {
     };
 
     Signature.prototype.verifyHash = function verifyHash(hash, public_key) {
-        assert.equal(
-            hash.length,
-            32,
-            "A SHA 256 should be 32 bytes long, instead got " + hash.length
-        );
-        return verify(
-            secp256k1,
-            hash,
-            {
-                r: this.r,
-                s: this.s
-            },
-            public_key.Q
-        );
+        assert.equal(hash.length, 32, "A SHA 256 should be 32 bytes long, instead got " + hash.length);
+        return verify(secp256k1, hash, {
+            r: this.r,
+            s: this.s
+        }, public_key.Q);
     };
 
     /* <HEX> */
 
     Signature.prototype.toByteBuffer = function toByteBuffer() {
         var b;
-        b = new ByteBuffer(
-            ByteBuffer.DEFAULT_CAPACITY,
-            ByteBuffer.LITTLE_ENDIAN
-        );
+        b = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN);
         this.appendByteBuffer(b);
         return b.copy(0, b.offset);
     };
@@ -170,17 +140,17 @@ var Signature = (function() {
 
     Signature.signHex = function signHex(hex, private_key) {
         var buf;
-        buf = new Buffer(hex, "hex");
+        buf = new Buffer(hex, 'hex');
         return Signature.signBuffer(buf, private_key);
     };
 
     Signature.prototype.verifyHex = function verifyHex(hex, public_key) {
         var buf;
-        buf = new Buffer(hex, "hex");
+        buf = new Buffer(hex, 'hex');
         return this.verifyBuffer(buf, public_key);
     };
 
     return Signature;
-})();
+}();
 
 export default Signature;

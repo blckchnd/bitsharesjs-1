@@ -1,6 +1,7 @@
-"use strict";
+'use strict';
 
 exports.__esModule = true;
+
 
 /**
     Account names may contain one or more names separated by a dot.
@@ -12,10 +13,7 @@ var id_regex = /\b\d+\.\d+\.(\d+)\b/;
 
 var chainValidation = {
     is_account_name: function is_account_name(value) {
-        var allow_too_short =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : false;
+        var allow_too_short = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
         var i, label, len, length, ref;
 
@@ -25,22 +23,17 @@ var chainValidation = {
 
         length = value.length;
 
-        if ((!allow_too_short && length < 3) || length > 63) {
+        if (!allow_too_short && length < 3 || length > 63) {
             return false;
         }
 
-        ref = value.split(".");
+        ref = value.split('.');
 
         for (i = 0, len = ref.length; i < len; i++) {
+
             label = ref[i];
 
-            if (
-                !(
-                    /^[a-z][a-z0-9-]*$/.test(label) &&
-                    !/--/.test(label) &&
-                    /[a-z0-9]$/.test(label)
-                )
-            ) {
+            if (!(/^[a-z][a-z0-9-]*$/.test(label) && !/--/.test(label) && /[a-z0-9]$/.test(label))) {
                 return false;
             }
         }
@@ -48,7 +41,7 @@ var chainValidation = {
     },
 
     is_object_id: function is_object_id(obj_id) {
-        if ("string" != typeof obj_id) return false;
+        if ('string' != typeof obj_id) return false;
 
         var match = id_regex.exec(obj_id);
         return match !== null && obj_id.split(".").length === 3;
@@ -58,10 +51,7 @@ var chainValidation = {
         return value == null || value.length === 0;
     },
 
-    is_account_name_error: function is_account_name_error(
-        value,
-        allow_too_short
-    ) {
+    is_account_name_error: function is_account_name_error(value, allow_too_short) {
         var i, label, len, length, ref, suffix;
         if (allow_too_short == null) {
             allow_too_short = false;
@@ -80,7 +70,7 @@ var chainValidation = {
         if (/\./.test(value)) {
             suffix = "Each account segment should ";
         }
-        ref = value.split(".");
+        ref = value.split('.');
         for (i = 0, len = ref.length; i < len; i++) {
             label = ref[i];
             if (!/^[~a-z]/.test(label)) {
@@ -103,7 +93,8 @@ var chainValidation = {
     },
 
     is_cheap_name: function is_cheap_name(account_name) {
-        return /[0-9-]/.test(account_name) || !/[aeiouy]/.test(account_name);
+        return (/[0-9-]/.test(account_name) || !/[aeiouy]/.test(account_name)
+        );
     },
 
     is_empty_user_input: function is_empty_user_input(value) {
@@ -117,10 +108,7 @@ var chainValidation = {
     },
 
     required: function required(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
         if (this.is_empty(value)) {
             throw new Error("value required for " + field_name + ": " + value);
@@ -134,7 +122,7 @@ var chainValidation = {
         if (this.is_empty(value)) {
             return suffix + "not be empty.";
         }
-        if (value.split(".").length > 2) {
+        if (value.split('.').length > 2) {
             return suffix + "have only one dot.";
         }
         if (value.length < 3) {
@@ -157,4 +145,4 @@ var chainValidation = {
 };
 
 exports.default = chainValidation;
-module.exports = exports["default"];
+module.exports = exports['default'];

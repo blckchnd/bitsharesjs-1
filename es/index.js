@@ -6,7 +6,7 @@ import * as ops from "./serializer/src/operations";
 import template from "./serializer/src/template";
 import SerializerValidation from "./serializer/src/SerializerValidation";
 
-export {Serializer, fp, types, ops, template, SerializerValidation};
+export { Serializer, fp, types, ops, template, SerializerValidation };
 
 /* ECC */
 import Address from "./ecc/src/address";
@@ -18,7 +18,7 @@ import brainKey from "./ecc/src/BrainKey";
 import * as hash from "./ecc/src/hash";
 import key from "./ecc/src/KeyUtils";
 
-export {Address, Aes, PrivateKey, PublicKey, Signature, brainKey, hash, key};
+export { Address, Aes, PrivateKey, PublicKey, Signature, brainKey, hash, key };
 
 /* Chain */
 import ChainStore from "./chain/src/ChainStore";
@@ -34,16 +34,5 @@ import Login from "./chain/src/AccountLogin";
 var FetchChainObjects = ChainStore.FetchChainObjects,
     FetchChain = ChainStore.FetchChain;
 
-export {
-    ChainStore,
-    TransactionBuilder,
-    FetchChainObjects,
-    ChainTypes,
-    EmitterInstance,
-    ObjectId,
-    NumberUtils,
-    TransactionHelper,
-    ChainValidation,
-    FetchChain,
-    Login
-};
+
+export { ChainStore, TransactionBuilder, FetchChainObjects, ChainTypes, EmitterInstance, ObjectId, NumberUtils, TransactionHelper, ChainValidation, FetchChain, Login };

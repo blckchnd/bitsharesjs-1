@@ -1,16 +1,4 @@
-var _typeof =
-    typeof Symbol === "function" && typeof Symbol.iterator === "symbol"
-        ? function(obj) {
-              return typeof obj;
-          }
-        : function(obj) {
-              return obj &&
-                  typeof Symbol === "function" &&
-                  obj.constructor === Symbol &&
-                  obj !== Symbol.prototype
-                  ? "symbol"
-                  : typeof obj;
-          };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 import assert from "assert";
 
@@ -29,16 +17,9 @@ var NumberUtils = {
             number = "" + number;
         } else if (number.toString) number = number.toString();
 
-        assert(
-            typeof number === "string",
-            "number should be an actual number or string: " +
-                (typeof number === "undefined" ? "undefined" : _typeof(number))
-        );
+        assert(typeof number === "string", "number should be an actual number or string: " + (typeof number === "undefined" ? "undefined" : _typeof(number)));
         number = number.trim();
-        assert(
-            /^[0-9]*\.?[0-9]*$/.test(number),
-            "Invalid decimal number " + number
-        );
+        assert(/^[0-9]*\.?[0-9]*$/.test(number), "Invalid decimal number " + number);
 
         var _number$split = number.split("."),
             _number$split$ = _number$split[0],
@@ -47,21 +28,13 @@ var NumberUtils = {
             decimal = _number$split$2 === undefined ? "" : _number$split$2;
 
         var padding = precision - decimal.length;
-        assert(
-            padding >= 0,
-            "Too many decimal digits in " +
-                number +
-                " to create an implied decimal of " +
-                precision
-        );
+        assert(padding >= 0, "Too many decimal digits in " + number + " to create an implied decimal of " + precision);
 
         for (var i = 0; i < padding; i++) {
             decimal += "0";
-        }
-        while (whole.charAt(0) === "0") {
+        }while (whole.charAt(0) === "0") {
             whole = whole.substring(1);
-        }
-        return whole + decimal;
+        }return whole + decimal;
     }
 };
 

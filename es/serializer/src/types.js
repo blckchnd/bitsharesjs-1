@@ -1,16 +1,4 @@
-var _typeof =
-    typeof Symbol === "function" && typeof Symbol.iterator === "symbol"
-        ? function(obj) {
-              return typeof obj;
-          }
-        : function(obj) {
-              return obj &&
-                  typeof Symbol === "function" &&
-                  obj.constructor === Symbol &&
-                  obj !== Symbol.prototype
-                  ? "symbol"
-                  : typeof obj;
-          };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 // Low-level types that make up operations
 
@@ -20,8 +8,8 @@ import fp from "./FastParser";
 import ChainTypes from "../../chain/src/ChainTypes";
 import ObjectId from "../../chain/src/ObjectId";
 
-import {PublicKey, Address} from "../../ecc";
-import {ChainConfig} from "bitsharesjs-ws";
+import { PublicKey, Address } from "../../ecc";
+import { ChainConfig } from "vinchainjs-ws";
 
 var Types = {};
 
@@ -41,10 +29,7 @@ Types.uint8 = {
         return object;
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return 0;
@@ -68,10 +53,7 @@ Types.uint16 = {
         return object;
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return 0;
@@ -95,10 +77,7 @@ Types.uint32 = {
         return object;
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return 0;
@@ -116,39 +95,21 @@ Types.varint32 = {
         return b.readVarint32();
     },
     appendByteBuffer: function appendByteBuffer(b, object) {
-        v.require_range(
-            MIN_SIGNED_32,
-            MAX_SIGNED_32,
-            object,
-            "uint32 " + object
-        );
+        v.require_range(MIN_SIGNED_32, MAX_SIGNED_32, object, "uint32 " + object);
         b.writeVarint32(object);
         return;
     },
     fromObject: function fromObject(object) {
-        v.require_range(
-            MIN_SIGNED_32,
-            MAX_SIGNED_32,
-            object,
-            "uint32 " + object
-        );
+        v.require_range(MIN_SIGNED_32, MAX_SIGNED_32, object, "uint32 " + object);
         return object;
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return 0;
         }
-        v.require_range(
-            MIN_SIGNED_32,
-            MAX_SIGNED_32,
-            object,
-            "uint32 " + object
-        );
+        v.require_range(MIN_SIGNED_32, MAX_SIGNED_32, object, "uint32 " + object);
         return parseInt(object);
     }
 };
@@ -167,10 +128,7 @@ Types.int64 = {
         return v.to_long(object);
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return "0";
@@ -192,10 +150,7 @@ Types.uint64 = {
         return v.to_long(v.unsigned(object), undefined, true);
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return "0";
@@ -208,7 +163,7 @@ Types.string = {
     fromByteBuffer: function fromByteBuffer(b) {
         var b_copy;
         var len = b.readVarint32();
-        (b_copy = b.copy(b.offset, b.offset + len)), b.skip(len);
+        b_copy = b.copy(b.offset, b.offset + len), b.skip(len);
         return new Buffer(b_copy.toBinary(), "binary");
     },
     appendByteBuffer: function appendByteBuffer(b, object) {
@@ -222,10 +177,7 @@ Types.string = {
         return new Buffer(object);
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return "";
@@ -234,16 +186,16 @@ Types.string = {
     }
 };
 
-Types.bytes = function(size) {
+Types.bytes = function (size) {
     return {
         fromByteBuffer: function fromByteBuffer(b) {
             if (size === undefined) {
                 var b_copy;
                 var len = b.readVarint32();
-                (b_copy = b.copy(b.offset, b.offset + len)), b.skip(len);
+                b_copy = b.copy(b.offset, b.offset + len), b.skip(len);
                 return new Buffer(b_copy.toBinary(), "binary");
             } else {
-                (b_copy = b.copy(b.offset, b.offset + size)), b.skip(size);
+                b_copy = b.copy(b.offset, b.offset + size), b.skip(size);
                 return new Buffer(b_copy.toBinary(), "binary");
             }
         },
@@ -264,10 +216,7 @@ Types.bytes = function(size) {
             return new Buffer(object, "hex");
         },
         toObject: function toObject(object) {
-            var debug =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {};
+            var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
             if (debug.use_default && object === undefined) {
                 var zeros = function zeros(num) {
@@ -294,10 +243,7 @@ Types.bool = {
         return JSON.parse(object) ? true : false;
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return false;
@@ -317,10 +263,7 @@ Types.void = {
         throw new Error("(void) undefined type");
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return undefined;
@@ -329,7 +272,7 @@ Types.void = {
     }
 };
 
-Types.array = function(st_operation) {
+Types.array = function (st_operation) {
     return {
         fromByteBuffer: function fromByteBuffer(b) {
             var size = b.readVarint32();
@@ -337,11 +280,7 @@ Types.array = function(st_operation) {
                 console.log("varint32 size = " + size.toString(16));
             }
             var result = [];
-            for (
-                var i = 0;
-                0 < size ? i < size : i > size;
-                0 < size ? i++ : i++
-            ) {
+            for (var i = 0; 0 < size ? i < size : i > size; 0 < size ? i++ : i++) {
                 result.push(st_operation.fromByteBuffer(b));
             }
             return sortOperation(result, st_operation);
@@ -366,10 +305,7 @@ Types.array = function(st_operation) {
             return result;
         },
         toObject: function toObject(object) {
-            var debug =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {};
+            var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
             if (debug.use_default && object === undefined) {
                 return [st_operation.toObject(object, debug)];
@@ -392,8 +328,7 @@ Types.time_point_sec = {
         return b.readUint32();
     },
     appendByteBuffer: function appendByteBuffer(b, object) {
-        if (typeof object !== "number")
-            object = Types.time_point_sec.fromObject(object);
+        if (typeof object !== "number") object = Types.time_point_sec.fromObject(object);
 
         b.writeUint32(object);
         return;
@@ -405,22 +340,16 @@ Types.time_point_sec = {
 
         if (object.getTime) return Math.floor(object.getTime() / 1000);
 
-        if (typeof object !== "string")
-            throw new Error("Unknown date type: " + object);
+        if (typeof object !== "string") throw new Error("Unknown date type: " + object);
 
-        if (/T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]$/.test(object))
-            object = object + "Z";
+        if (/T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]$/.test(object)) object = object + "Z";
 
         return Math.floor(new Date(object).getTime() / 1000);
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        if (debug.use_default && object === undefined)
-            return new Date(0).toISOString().split(".")[0];
+        if (debug.use_default && object === undefined) return new Date(0).toISOString().split(".")[0];
 
         v.required(object);
 
@@ -434,18 +363,14 @@ Types.time_point_sec = {
     }
 };
 
-Types.set = function(st_operation) {
+Types.set = function (st_operation) {
     return {
         validate: function validate(array) {
             var dup_map = {};
             for (var i = 0, o; i < array.length; i++) {
                 o = array[i];
                 var ref;
-                if (
-                    ((ref =
-                        typeof o === "undefined" ? "undefined" : _typeof(o)),
-                    ["string", "number"].indexOf(ref) >= 0)
-                ) {
+                if (ref = typeof o === "undefined" ? "undefined" : _typeof(o), ["string", "number"].indexOf(ref) >= 0) {
                     if (dup_map[o] !== undefined) {
                         throw new Error("duplicate (set)");
                     }
@@ -459,19 +384,13 @@ Types.set = function(st_operation) {
             if (HEX_DUMP) {
                 console.log("varint32 size = " + size.toString(16));
             }
-            return this.validate(
-                (function() {
-                    var result = [];
-                    for (
-                        var i = 0;
-                        0 < size ? i < size : i > size;
-                        0 < size ? i++ : i++
-                    ) {
-                        result.push(st_operation.fromByteBuffer(b));
-                    }
-                    return result;
-                })()
-            );
+            return this.validate(function () {
+                var result = [];
+                for (var i = 0; 0 < size ? i < size : i > size; 0 < size ? i++ : i++) {
+                    result.push(st_operation.fromByteBuffer(b));
+                }
+                return result;
+            }());
         },
         appendByteBuffer: function appendByteBuffer(b, object) {
             if (!object) {
@@ -489,22 +408,17 @@ Types.set = function(st_operation) {
             if (!object) {
                 object = [];
             }
-            return this.validate(
-                (function() {
-                    var result = [];
-                    for (var i = 0, o; i < object.length; i++) {
-                        o = object[i];
-                        result.push(st_operation.fromObject(o));
-                    }
-                    return result;
-                })()
-            );
+            return this.validate(function () {
+                var result = [];
+                for (var i = 0, o; i < object.length; i++) {
+                    o = object[i];
+                    result.push(st_operation.fromObject(o));
+                }
+                return result;
+            }());
         },
         toObject: function toObject(object) {
-            var debug =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {};
+            var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
             if (debug.use_default && object === undefined) {
                 return [st_operation.toObject(object, debug)];
@@ -512,22 +426,20 @@ Types.set = function(st_operation) {
             if (!object) {
                 object = [];
             }
-            return this.validate(
-                (function() {
-                    var result = [];
-                    for (var i = 0, o; i < object.length; i++) {
-                        o = object[i];
-                        result.push(st_operation.toObject(o, debug));
-                    }
-                    return result;
-                })()
-            );
+            return this.validate(function () {
+                var result = [];
+                for (var i = 0, o; i < object.length; i++) {
+                    o = object[i];
+                    result.push(st_operation.toObject(o, debug));
+                }
+                return result;
+            }());
         }
     };
 };
 
 // global_parameters_update_operation current_fees
-Types.fixed_array = function(count, st_operation) {
+Types.fixed_array = function (count, st_operation) {
     return {
         fromByteBuffer: function fromByteBuffer(b) {
             var i, j, ref, results;
@@ -614,10 +526,7 @@ var id_type = function id_type(reserved_spaces, object_type) {
             return v.get_instance(reserved_spaces, object_type, object);
         },
         toObject: function toObject(object) {
-            var debug =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {};
+            var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
             var object_type_id = ChainTypes.object_type[object_type];
             if (debug.use_default && object === undefined) {
@@ -636,7 +545,7 @@ var id_type = function id_type(reserved_spaces, object_type) {
     };
 };
 
-Types.protocol_id_type = function(name) {
+Types.protocol_id_type = function (name) {
     v.required(name, "name");
     return id_type(ChainTypes.reserved_spaces.protocol_ids, name);
 };
@@ -662,10 +571,7 @@ Types.object_id_type = {
         return ObjectId.fromString(object);
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return "0.0.0";
@@ -693,16 +599,13 @@ Types.vote_id = {
         v.required(object);
         if (object === "string") object = Types.vote_id.fromObject(object);
 
-        var value = (object.id << 8) | object.type;
+        var value = object.id << 8 | object.type;
         b.writeUint32(value);
         return;
     },
     fromObject: function fromObject(object) {
         v.required(object, "(type vote_id)");
-        if (
-            (typeof object === "undefined" ? "undefined" : _typeof(object)) ===
-            "object"
-        ) {
+        if ((typeof object === "undefined" ? "undefined" : _typeof(object)) === "object") {
             v.required(object.type, "type");
             v.required(object.id, "id");
             return object;
@@ -715,33 +618,27 @@ Types.vote_id = {
 
         v.require_range(0, 0xff, type, "vote type " + object);
         v.require_range(0, 0xffffff, id, "vote id " + object);
-        return {type: type, id: id};
+        return { type: type, id: id };
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
             return "0:0";
         }
         v.required(object);
-        if (typeof object === "string")
-            object = Types.vote_id.fromObject(object);
+        if (typeof object === "string") object = Types.vote_id.fromObject(object);
 
         return object.type + ":" + object.id;
     },
     compare: function compare(a, b) {
-        if ((typeof a === "undefined" ? "undefined" : _typeof(a)) !== "object")
-            a = Types.vote_id.fromObject(a);
-        if ((typeof b === "undefined" ? "undefined" : _typeof(b)) !== "object")
-            b = Types.vote_id.fromObject(b);
+        if ((typeof a === "undefined" ? "undefined" : _typeof(a)) !== "object") a = Types.vote_id.fromObject(a);
+        if ((typeof b === "undefined" ? "undefined" : _typeof(b)) !== "object") b = Types.vote_id.fromObject(b);
         return parseInt(a.id) - parseInt(b.id);
     }
 };
 
-Types.optional = function(st_operation) {
+Types.optional = function (st_operation) {
     v.required(st_operation, "st_operation");
     return {
         fromByteBuffer: function fromByteBuffer(b) {
@@ -766,29 +663,22 @@ Types.optional = function(st_operation) {
             return st_operation.fromObject(object);
         },
         toObject: function toObject(object) {
-            var debug =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {};
+            var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
             // toObject is only null save if use_default is true
-            var result_object = (function() {
+            var result_object = function () {
                 if (!debug.use_default && object === undefined) {
                     return undefined;
                 } else {
                     return st_operation.toObject(object, debug);
                 }
-            })();
+            }();
 
             if (debug.annotate) {
-                if (
-                    (typeof result_object === "undefined"
-                        ? "undefined"
-                        : _typeof(result_object)) === "object"
-                ) {
+                if ((typeof result_object === "undefined" ? "undefined" : _typeof(result_object)) === "object") {
                     result_object.__optional = "parent is optional";
                 } else {
-                    result_object = {__optional: result_object};
+                    result_object = { __optional: result_object };
                 }
             }
             return result_object;
@@ -796,7 +686,7 @@ Types.optional = function(st_operation) {
     };
 };
 
-Types.static_variant = function(_st_operations) {
+Types.static_variant = function (_st_operations) {
     return {
         nosort: true,
         st_operations: _st_operations,
@@ -804,13 +694,7 @@ Types.static_variant = function(_st_operations) {
             var type_id = b.readVarint32();
             var st_operation = this.st_operations[type_id];
             if (HEX_DUMP) {
-                console.error(
-                    "static_variant id 0x" +
-                        type_id.toString(16) +
-                        " (" +
-                        type_id +
-                        ")"
-                );
+                console.error("static_variant id 0x" + type_id.toString(16) + " (" + type_id + ")");
             }
             v.required(st_operation, "operation " + type_id);
             return [type_id, st_operation.fromByteBuffer(b)];
@@ -832,10 +716,7 @@ Types.static_variant = function(_st_operations) {
             return [type_id, st_operation.fromObject(object[1])];
         },
         toObject: function toObject(object) {
-            var debug =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {};
+            var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
             if (debug.use_default && object === undefined) {
                 return [0, this.st_operations[0].toObject(undefined, debug)];
@@ -849,7 +730,7 @@ Types.static_variant = function(_st_operations) {
     };
 };
 
-Types.map = function(key_st_operation, value_st_operation) {
+Types.map = function (key_st_operation, value_st_operation) {
     return {
         validate: function validate(array) {
             if (!Array.isArray(array)) {
@@ -862,10 +743,7 @@ Types.map = function(key_st_operation, value_st_operation) {
                 if (!(o.length === 2)) {
                     throw new Error("expecting two elements");
                 }
-                if (
-                    ((ref = _typeof(o[0])),
-                    ["number", "string"].indexOf(ref) >= 0)
-                ) {
+                if (ref = _typeof(o[0]), ["number", "string"].indexOf(ref) >= 0) {
                     if (dup_map[o[0]] !== undefined) {
                         throw new Error("duplicate (map)");
                     }
@@ -878,10 +756,7 @@ Types.map = function(key_st_operation, value_st_operation) {
             var result = [];
             var end = b.readVarint32();
             for (var i = 0; 0 < end ? i < end : i > end; 0 < end ? i++ : i++) {
-                result.push([
-                    key_st_operation.fromByteBuffer(b),
-                    value_st_operation.fromByteBuffer(b)
-                ]);
+                result.push([key_st_operation.fromByteBuffer(b), value_st_operation.fromByteBuffer(b)]);
             }
             return this.validate(result);
         },
@@ -900,36 +775,22 @@ Types.map = function(key_st_operation, value_st_operation) {
             var result = [];
             for (var i = 0, o; i < object.length; i++) {
                 o = object[i];
-                result.push([
-                    key_st_operation.fromObject(o[0]),
-                    value_st_operation.fromObject(o[1])
-                ]);
+                result.push([key_st_operation.fromObject(o[0]), value_st_operation.fromObject(o[1])]);
             }
             return this.validate(result);
         },
         toObject: function toObject(object) {
-            var debug =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {};
+            var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
             if (debug.use_default && object === undefined) {
-                return [
-                    [
-                        key_st_operation.toObject(undefined, debug),
-                        value_st_operation.toObject(undefined, debug)
-                    ]
-                ];
+                return [[key_st_operation.toObject(undefined, debug), value_st_operation.toObject(undefined, debug)]];
             }
             v.required(object);
             object = this.validate(object);
             var result = [];
             for (var i = 0, o; i < object.length; i++) {
                 o = object[i];
-                result.push([
-                    key_st_operation.toObject(o[0], debug),
-                    value_st_operation.toObject(o[1], debug)
-                ]);
+                result.push([key_st_operation.toObject(o[0], debug), value_st_operation.toObject(o[1], debug)]);
             }
             return result;
         }
@@ -941,11 +802,7 @@ Types.public_key = {
         if (object.resolve !== undefined) {
             object = object.resolve;
         }
-        return object == null
-            ? object
-            : object.Q
-                ? object
-                : PublicKey.fromStringOrThrow(object);
+        return object == null ? object : object.Q ? object : PublicKey.fromStringOrThrow(object);
     },
     fromByteBuffer: function fromByteBuffer(b) {
         return fp.public_key(b);
@@ -963,25 +820,16 @@ Types.public_key = {
         return Types.public_key.toPublic(object);
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
-            return (
-                ChainConfig.address_prefix +
-                "859gxfnXyUriMgUeThh1fWv3oqcpLFyHa3TfFYC4PK2HqhToVM"
-            );
+            return ChainConfig.address_prefix + "859gxfnXyUriMgUeThh1fWv3oqcpLFyHa3TfFYC4PK2HqhToVM";
         }
         v.required(object);
         return object.toString();
     },
     compare: function compare(a, b) {
-        return Types.public_key
-            .fromObject(a)
-            .toBlockchainAddress()
-            .compare(Types.public_key.fromObject(b).toBlockchainAddress());
+        return Types.public_key.fromObject(a).toBlockchainAddress().compare(Types.public_key.fromObject(b).toBlockchainAddress());
     }
 };
 
@@ -1004,15 +852,10 @@ Types.address = {
         return Types.address._to_address(object);
     },
     toObject: function toObject(object) {
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         if (debug.use_default && object === undefined) {
-            return (
-                ChainConfig.address_prefix + "664KmHxSuQyDsfwo4WEJvWpzg1QKdg67S"
-            );
+            return ChainConfig.address_prefix + "664KmHxSuQyDsfwo4WEJvWpzg1QKdg67S";
         }
         return Types.address._to_address(object).toString();
     },
@@ -1028,27 +871,13 @@ var firstEl = function firstEl(el) {
     return Array.isArray(el) ? el[0] : el;
 };
 var sortOperation = function sortOperation(array, st_operation) {
-    return st_operation.nosort
-        ? array
-        : st_operation.compare
-            ? array.sort(function(a, b) {
-                  return st_operation.compare(firstEl(a), firstEl(b));
-              }) // custom compare operation
-            : array.sort(function(a, b) {
-                  return typeof firstEl(a) === "number" &&
-                      typeof firstEl(b) === "number"
-                      ? firstEl(a) - firstEl(b) // A binary string compare does not work. Performanance is very good so HEX is used..  localeCompare is another option.
-                      : Buffer.isBuffer(firstEl(a)) &&
-                        Buffer.isBuffer(firstEl(b))
-                          ? strCmp(
-                                firstEl(a).toString("hex"),
-                                firstEl(b).toString("hex")
-                            )
-                          : strCmp(
-                                firstEl(a).toString(),
-                                firstEl(b).toString()
-                            );
-              });
+    return st_operation.nosort ? array : st_operation.compare ? array.sort(function (a, b) {
+        return st_operation.compare(firstEl(a), firstEl(b));
+    }) // custom compare operation
+    : array.sort(function (a, b) {
+        return typeof firstEl(a) === "number" && typeof firstEl(b) === "number" ? firstEl(a) - firstEl(b) : // A binary string compare does not work. Performanance is very good so HEX is used..  localeCompare is another option.
+        Buffer.isBuffer(firstEl(a)) && Buffer.isBuffer(firstEl(b)) ? strCmp(firstEl(a).toString("hex"), firstEl(b).toString("hex")) : strCmp(firstEl(a).toString(), firstEl(b).toString());
+    });
 };
 
 export default Types;

@@ -27,25 +27,9 @@ var _SerializerValidation = require("./src/SerializerValidation");
 
 var _SerializerValidation2 = _interopRequireDefault(_SerializerValidation);
 
-function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-        return obj;
-    } else {
-        var newObj = {};
-        if (obj != null) {
-            for (var key in obj) {
-                if (Object.prototype.hasOwnProperty.call(obj, key))
-                    newObj[key] = obj[key];
-            }
-        }
-        newObj.default = obj;
-        return newObj;
-    }
-}
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {default: obj};
-}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.Serializer = _serializer2.default;
 exports.fp = _FastParser2.default;

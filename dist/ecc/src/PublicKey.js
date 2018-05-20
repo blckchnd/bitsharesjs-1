@@ -1,42 +1,37 @@
-"use strict";
+'use strict';
 
 exports.__esModule = true;
 
-var _bigi = require("bigi");
+var _bigi = require('bigi');
 
 var _bigi2 = _interopRequireDefault(_bigi);
 
-var _ecurve = require("ecurve");
+var _ecurve = require('ecurve');
 
-var _bs = require("bs58");
+var _bs = require('bs58');
 
-var _hash = require("./hash");
+var _hash = require('./hash');
 
-var _bitsharesjsWs = require("bitsharesjs-ws");
+var _vinchainjsWs = require('vinchainjs-ws');
 
-var _assert = require("assert");
+var _assert = require('assert');
 
 var _assert2 = _interopRequireDefault(_assert);
 
-var _deepEqual = require("deep-equal");
+var _deepEqual = require('deep-equal');
 
 var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
-function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {default: obj};
-}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var secp256k1 = (0, _ecurve.getCurveByName)("secp256k1");
+var secp256k1 = (0, _ecurve.getCurveByName)('secp256k1');
 var G = secp256k1.G,
     n = secp256k1.n;
 
-var PublicKey = (function() {
+var PublicKey = function () {
+
     /** @param {Point} public key */
     function PublicKey(Q) {
         _classCallCheck(this, PublicKey);
@@ -45,31 +40,18 @@ var PublicKey = (function() {
     }
 
     PublicKey.fromBinary = function fromBinary(bin) {
-        return PublicKey.fromBuffer(new Buffer(bin, "binary"));
+        return PublicKey.fromBuffer(new Buffer(bin, 'binary'));
     };
 
     PublicKey.fromBuffer = function fromBuffer(buffer) {
-        if (
-            buffer.toString("hex") ===
-            "000000000000000000000000000000000000000000000000000000000000000000"
-        )
-            return new PublicKey(null);
+        if (buffer.toString('hex') === '000000000000000000000000000000000000000000000000000000000000000000') return new PublicKey(null);
         return new PublicKey(_ecurve.Point.decodeFrom(secp256k1, buffer));
     };
 
     PublicKey.prototype.toBuffer = function toBuffer() {
-        var compressed =
-            arguments.length > 0 && arguments[0] !== undefined
-                ? arguments[0]
-                : this.Q
-                    ? this.Q.compressed
-                    : null;
+        var compressed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.Q ? this.Q.compressed : null;
 
-        if (this.Q === null)
-            return new Buffer(
-                "000000000000000000000000000000000000000000000000000000000000000000",
-                "hex"
-            );
+        if (this.Q === null) return new Buffer('000000000000000000000000000000000000000000000000000000000000000000', 'hex');
         return this.Q.getEncoded(compressed);
     };
 
@@ -85,6 +67,7 @@ var PublicKey = (function() {
 
     /** bts::blockchain::address (unique but not a full public key) */
 
+
     PublicKey.prototype.toBlockchainAddress = function toBlockchainAddress() {
         var pub_buf = this.toBuffer();
         var pub_sha = (0, _hash.sha512)(pub_buf);
@@ -93,11 +76,9 @@ var PublicKey = (function() {
 
     /** Alias for {@link toPublicKeyString} */
 
+
     PublicKey.prototype.toString = function toString() {
-        var address_prefix =
-            arguments.length > 0 && arguments[0] !== undefined
-                ? arguments[0]
-                : _bitsharesjsWs.ChainConfig.address_prefix;
+        var address_prefix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _vinchainjsWs.ChainConfig.address_prefix;
 
         return this.toPublicKeyString(address_prefix);
     };
@@ -107,11 +88,9 @@ var PublicKey = (function() {
         {return} string
     */
 
+
     PublicKey.prototype.toPublicKeyString = function toPublicKeyString() {
-        var address_prefix =
-            arguments.length > 0 && arguments[0] !== undefined
-                ? arguments[0]
-                : _bitsharesjsWs.ChainConfig.address_prefix;
+        var address_prefix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _vinchainjsWs.ChainConfig.address_prefix;
 
         var pub_buf = this.toBuffer();
         var checksum = (0, _hash.ripemd160)(pub_buf);
@@ -125,11 +104,9 @@ var PublicKey = (function() {
         @return PublicKey or `null` (if the public_key string is invalid)
     */
 
+
     PublicKey.fromPublicKeyString = function fromPublicKeyString(public_key) {
-        var address_prefix =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : _bitsharesjsWs.ChainConfig.address_prefix;
+        var address_prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _vinchainjsWs.ChainConfig.address_prefix;
 
         try {
             return PublicKey.fromStringOrThrow(public_key, address_prefix);
@@ -145,24 +122,15 @@ var PublicKey = (function() {
         @return PublicKey
     */
 
+
     PublicKey.fromStringOrThrow = function fromStringOrThrow(public_key) {
-        var address_prefix =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : _bitsharesjsWs.ChainConfig.address_prefix;
+        var address_prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _vinchainjsWs.ChainConfig.address_prefix;
 
         var prefix = public_key.slice(0, address_prefix.length);
-        _assert2.default.equal(
-            address_prefix,
-            prefix,
-            "Expecting key to begin with " +
-                address_prefix +
-                ", instead got " +
-                prefix
-        );
+        _assert2.default.equal(address_prefix, prefix, 'Expecting key to begin with ' + address_prefix + ', instead got ' + prefix);
         public_key = public_key.slice(address_prefix.length);
 
-        public_key = new Buffer((0, _bs.decode)(public_key), "binary");
+        public_key = new Buffer((0, _bs.decode)(public_key), 'binary');
         var checksum = public_key.slice(-4);
         public_key = public_key.slice(0, -4);
         var new_checksum = (0, _hash.ripemd160)(public_key);
@@ -175,10 +143,7 @@ var PublicKey = (function() {
     };
 
     PublicKey.prototype.toAddressString = function toAddressString() {
-        var address_prefix =
-            arguments.length > 0 && arguments[0] !== undefined
-                ? arguments[0]
-                : _bitsharesjsWs.ChainConfig.address_prefix;
+        var address_prefix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _vinchainjsWs.ChainConfig.address_prefix;
 
         var pub_buf = this.toBuffer();
         var pub_sha = (0, _hash.sha512)(pub_buf);
@@ -202,10 +167,8 @@ var PublicKey = (function() {
     };
 
     PublicKey.prototype.child = function child(offset) {
-        (0, _assert2.default)(
-            Buffer.isBuffer(offset),
-            "Buffer required: offset"
-        );
+
+        (0, _assert2.default)(Buffer.isBuffer(offset), "Buffer required: offset");
         _assert2.default.equal(offset.length, 32, "offset length");
 
         offset = Buffer.concat([this.toBuffer(), offset]);
@@ -213,16 +176,12 @@ var PublicKey = (function() {
 
         var c = _bigi2.default.fromBuffer(offset);
 
-        if (c.compareTo(n) >= 0)
-            throw new Error("Child offset went out of bounds, try again");
+        if (c.compareTo(n) >= 0) throw new Error("Child offset went out of bounds, try again");
 
         var cG = G.multiply(c);
         var Qprime = this.Q.add(cG);
 
-        if (secp256k1.isInfinity(Qprime))
-            throw new Error(
-                "Child offset derived to an invalid key, try again"
-            );
+        if (secp256k1.isInfinity(Qprime)) throw new Error("Child offset derived to an invalid key, try again");
 
         return PublicKey.fromPoint(Qprime);
     };
@@ -230,30 +189,28 @@ var PublicKey = (function() {
     /* <HEX> */
 
     PublicKey.prototype.toByteBuffer = function toByteBuffer() {
-        var b = new ByteBuffer(
-            ByteBuffer.DEFAULT_CAPACITY,
-            ByteBuffer.LITTLE_ENDIAN
-        );
+        var b = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN);
         this.appendByteBuffer(b);
         return b.copy(0, b.offset);
     };
 
     PublicKey.fromHex = function fromHex(hex) {
-        return PublicKey.fromBuffer(new Buffer(hex, "hex"));
+        return PublicKey.fromBuffer(new Buffer(hex, 'hex'));
     };
 
     PublicKey.prototype.toHex = function toHex() {
-        return this.toBuffer().toString("hex");
+        return this.toBuffer().toString('hex');
     };
 
     PublicKey.fromPublicKeyStringHex = function fromPublicKeyStringHex(hex) {
-        return PublicKey.fromPublicKeyString(new Buffer(hex, "hex"));
+        return PublicKey.fromPublicKeyString(new Buffer(hex, 'hex'));
     };
 
     /* </HEX> */
 
+
     return PublicKey;
-})();
+}();
 
 exports.default = PublicKey;
-module.exports = exports["default"];
+module.exports = exports['default'];

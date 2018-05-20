@@ -11,15 +11,5 @@ import Login from "./src/AccountLogin";
 var FetchChainObjects = ChainStore.FetchChainObjects,
     FetchChain = ChainStore.FetchChain;
 
-export {
-    ChainStore,
-    TransactionBuilder,
-    FetchChainObjects,
-    ChainTypes,
-    ObjectId,
-    NumberUtils,
-    TransactionHelper,
-    ChainValidation,
-    FetchChain,
-    Login
-};
+
+export { ChainStore, TransactionBuilder, FetchChainObjects, ChainTypes, ObjectId, NumberUtils, TransactionHelper, ChainValidation, FetchChain, Login };

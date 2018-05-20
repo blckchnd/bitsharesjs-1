@@ -1,12 +1,8 @@
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 import PublicKey from "../../ecc/src/PublicKey";
 
-var FastParser = (function() {
+var FastParser = function () {
     function FastParser() {
         _classCallCheck(this, FastParser);
     }
@@ -16,15 +12,15 @@ var FastParser = (function() {
             return;
         }
         if (buffer) {
-            var data = buffer.slice(0, len).toString("binary");
-            b.append(data, "binary");
+            var data = buffer.slice(0, len).toString('binary');
+            b.append(data, 'binary');
             while (len-- > data.length) {
                 b.writeUint8(0);
             }
         } else {
             var b_copy = b.copy(b.offset, b.offset + len);
             b.skip(len);
-            return new Buffer(b_copy.toBinary(), "binary");
+            return new Buffer(b_copy.toBinary(), 'binary');
         }
     };
 
@@ -34,7 +30,7 @@ var FastParser = (function() {
         }
         if (_public_key) {
             var buffer = _public_key.toBuffer();
-            b.append(buffer.toString("binary"), "binary");
+            b.append(buffer.toString('binary'), 'binary');
             return;
         } else {
             buffer = FastParser.fixed_data(b, 33);
@@ -66,6 +62,6 @@ var FastParser = (function() {
     };
 
     return FastParser;
-})();
+}();
 
 export default FastParser;

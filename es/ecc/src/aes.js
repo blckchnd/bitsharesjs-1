@@ -1,53 +1,47 @@
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // https://code.google.com/p/crypto-js
 import AES from "crypto-js/aes";
 import encHex from "crypto-js/enc-hex";
 import encBase64 from "crypto-js/enc-base64";
 import assert from "assert";
-import {Long} from "bytebuffer";
-import {sha256, sha512} from "./hash";
+import { Long } from "bytebuffer";
+import { sha256, sha512 } from './hash';
 
 /** Provides symetric encrypt and decrypt via AES. */
 
-var Aes = (function() {
+var Aes = function () {
+
     /** @private */
     function Aes(iv, key) {
         _classCallCheck(this, Aes);
 
-        (this.iv = iv), (this.key = key);
+        this.iv = iv, this.key = key;
     }
 
     /** This is an excellent way to ensure that all references to Aes can not operate anymore (example: a wallet becomes locked).  An application should ensure there is only one Aes object instance for a given secret `seed`. */
 
+
     Aes.prototype.clear = function clear() {
-        return (this.iv = this.key = undefined);
+        return this.iv = this.key = undefined;
     };
 
     /** @arg {string} seed - secret seed may be used to encrypt or decrypt. */
+
 
     Aes.fromSeed = function fromSeed(seed) {
         if (seed === undefined) {
             throw new Error("seed is required");
         }
         var _hash = sha512(seed);
-        _hash = _hash.toString("hex");
+        _hash = _hash.toString('hex');
         // DEBUG console.log('... fromSeed _hash',_hash)
         return Aes.fromSha512(_hash);
     };
 
     /** @arg {string} hash - A 128 byte hex string, typically one would call {@link fromSeed} instead. */
     Aes.fromSha512 = function fromSha512(hash) {
-        assert.equal(
-            hash.length,
-            128,
-            "A Sha512 in HEX should be 128 characters long, instead got " +
-                hash.length
-        );
+        assert.equal(hash.length, 128, "A Sha512 in HEX should be 128 characters long, instead got " + hash.length);
         var iv = encHex.parse(hash.substring(64, 96));
         var key = encHex.parse(hash.substring(0, 64));
         return new Aes(iv, key);
@@ -55,12 +49,7 @@ var Aes = (function() {
 
     Aes.fromBuffer = function fromBuffer(buf) {
         assert(Buffer.isBuffer(buf), "Expecting Buffer");
-        assert.equal(
-            buf.length,
-            64,
-            "A Sha512 Buffer should be 64 characters long, instead got " +
-                buf.length
-        );
+        assert.equal(buf.length, 64, "A Sha512 Buffer should be 64 characters long, instead got " + buf.length);
         return Aes.fromSha512(buf.toString("hex"));
     };
     /**
@@ -72,24 +61,17 @@ var Aes = (function() {
         @return {Buffer}
     */
 
-    Aes.decrypt_with_checksum = function decrypt_with_checksum(
-        private_key,
-        public_key,
-        nonce,
-        message
-    ) {
-        var legacy =
-            arguments.length > 4 && arguments[4] !== undefined
-                ? arguments[4]
-                : false;
+
+    Aes.decrypt_with_checksum = function decrypt_with_checksum(private_key, public_key, nonce, message) {
+        var legacy = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+
 
         // Warning: Do not put `nonce = ""` in the arguments, in es6 this will not convert "null" into an emtpy string
-        if (nonce == null)
-            // null or undefined
+        if (nonce == null) // null or undefined
             nonce = "";
 
         if (!Buffer.isBuffer(message)) {
-            message = new Buffer(message, "hex");
+            message = new Buffer(message, 'hex');
         }
 
         var S = private_key.get_shared_secret(public_key, legacy);
@@ -102,13 +84,9 @@ var Aes = (function() {
         //     S: S.toString('hex')
         // })
 
-        var aes = Aes.fromSeed(
-            Buffer.concat([
-                // A null or empty string nonce will not effect the hash
-                new Buffer("" + nonce),
-                new Buffer(S.toString("hex"))
-            ])
-        );
+        var aes = Aes.fromSeed(Buffer.concat([
+        // A null or empty string nonce will not effect the hash
+        new Buffer("" + nonce), new Buffer(S.toString('hex'))]));
 
         var planebuffer = aes.decrypt(message);
         if (!(planebuffer.length >= 4)) {
@@ -124,9 +102,9 @@ var Aes = (function() {
 
         var new_checksum = sha256(plaintext);
         new_checksum = new_checksum.slice(0, 4);
-        new_checksum = new_checksum.toString("hex");
+        new_checksum = new_checksum.toString('hex');
 
-        if (!(checksum.toString("hex") === new_checksum)) {
+        if (!(checksum.toString('hex') === new_checksum)) {
             throw new Error("Invalid key, could not decrypt message(2)");
         }
 
@@ -136,20 +114,15 @@ var Aes = (function() {
     /** Identical to {@link decrypt_with_checksum} but used to encrypt.  Should not throw an error.
         @return {Buffer} message - Encrypted message which includes a checksum
     */
-    Aes.encrypt_with_checksum = function encrypt_with_checksum(
-        private_key,
-        public_key,
-        nonce,
-        message
-    ) {
+    Aes.encrypt_with_checksum = function encrypt_with_checksum(private_key, public_key, nonce, message) {
+
         // Warning: Do not put `nonce = ""` in the arguments, in es6 this will not convert "null" into an emtpy string
 
-        if (nonce == null)
-            // null or undefined
+        if (nonce == null) // null or undefined
             nonce = "";
 
         if (!Buffer.isBuffer(message)) {
-            message = new Buffer(message, "binary");
+            message = new Buffer(message, 'binary');
         }
 
         var S = private_key.get_shared_secret(public_key);
@@ -163,13 +136,9 @@ var Aes = (function() {
         //     S: S.toString('hex')
         // })
 
-        var aes = Aes.fromSeed(
-            Buffer.concat([
-                // A null or empty string nonce will not effect the hash
-                new Buffer("" + nonce),
-                new Buffer(S.toString("hex"))
-            ])
-        );
+        var aes = Aes.fromSeed(Buffer.concat([
+        // A null or empty string nonce will not effect the hash
+        new Buffer("" + nonce), new Buffer(S.toString('hex'))]));
         // DEBUG console.log('... S',S.toString('hex'))
         var checksum = sha256(message).slice(0, 4);
         var payload = Buffer.concat([checksum, message]);
@@ -181,18 +150,15 @@ var Aes = (function() {
     Aes.prototype._decrypt_word_array = function _decrypt_word_array(cipher) {
         // https://code.google.com/p/crypto-js/#Custom_Key_and_IV
         // see wallet_records.cpp master_key::decrypt_key
-        return AES.decrypt({ciphertext: cipher, salt: null}, this.key, {
-            iv: this.iv
-        });
+        return AES.decrypt({ ciphertext: cipher, salt: null }, this.key, { iv: this.iv });
     };
 
     /** @private */
 
-    Aes.prototype._encrypt_word_array = function _encrypt_word_array(
-        plaintext
-    ) {
+
+    Aes.prototype._encrypt_word_array = function _encrypt_word_array(plaintext) {
         //https://code.google.com/p/crypto-js/issues/detail?id=85
-        var cipher = AES.encrypt(plaintext, this.key, {iv: this.iv});
+        var cipher = AES.encrypt(plaintext, this.key, { iv: this.iv });
         return encBase64.parse(cipher.toString());
     };
 
@@ -201,17 +167,18 @@ var Aes = (function() {
         @return {Buffer} binary
     */
 
+
     Aes.prototype.decrypt = function decrypt(ciphertext) {
         if (typeof ciphertext === "string") {
-            ciphertext = new Buffer(ciphertext, "binary");
+            ciphertext = new Buffer(ciphertext, 'binary');
         }
         if (!Buffer.isBuffer(ciphertext)) {
             throw new Error("buffer required");
         }
         assert(ciphertext, "Missing cipher text");
         // hex is the only common format
-        var hex = this.decryptHex(ciphertext.toString("hex"));
-        return new Buffer(hex, "hex");
+        var hex = this.decryptHex(ciphertext.toString('hex'));
+        return new Buffer(hex, 'hex');
     };
 
     /** This method does not use a checksum, the returned data must be validated some other way.
@@ -219,17 +186,18 @@ var Aes = (function() {
         @return {Buffer} binary
     */
 
+
     Aes.prototype.encrypt = function encrypt(plaintext) {
         if (typeof plaintext === "string") {
-            plaintext = new Buffer(plaintext, "binary");
+            plaintext = new Buffer(plaintext, 'binary');
         }
         if (!Buffer.isBuffer(plaintext)) {
             throw new Error("buffer required");
         }
         //assert plaintext, "Missing plain text"
         // hex is the only common format
-        var hex = this.encryptHex(plaintext.toString("hex"));
-        return new Buffer(hex, "hex");
+        var hex = this.encryptHex(plaintext.toString('hex'));
+        return new Buffer(hex, 'hex');
     };
 
     /** This method does not use a checksum, the returned data must be validated some other way.
@@ -237,22 +205,24 @@ var Aes = (function() {
         @return {string} hex
     */
 
+
     Aes.prototype.encryptToHex = function encryptToHex(plaintext) {
         if (typeof plaintext === "string") {
-            plaintext = new Buffer(plaintext, "binary");
+            plaintext = new Buffer(plaintext, 'binary');
         }
         if (!Buffer.isBuffer(plaintext)) {
             throw new Error("buffer required");
         }
         //assert plaintext, "Missing plain text"
         // hex is the only common format
-        return this.encryptHex(plaintext.toString("hex"));
+        return this.encryptHex(plaintext.toString('hex'));
     };
 
     /** This method does not use a checksum, the returned data must be validated some other way.
         @arg {string} cipher - hex
         @return {string} binary (could easily be readable text)
     */
+
 
     Aes.prototype.decryptHex = function decryptHex(cipher) {
         assert(cipher, "Missing cipher text");
@@ -267,13 +237,14 @@ var Aes = (function() {
         @return {Buffer} encoded as specified by the parameter
     */
 
+
     Aes.prototype.decryptHexToBuffer = function decryptHexToBuffer(cipher) {
         assert(cipher, "Missing cipher text");
         // Convert data into word arrays (used by Crypto)
         var cipher_array = encHex.parse(cipher);
         var plainwords = this._decrypt_word_array(cipher_array);
         var plainhex = encHex.stringify(plainwords);
-        return new Buffer(plainhex, "hex");
+        return new Buffer(plainhex, 'hex');
     };
 
     /** This method does not use a checksum, the returned data must be validated some other way.
@@ -282,11 +253,9 @@ var Aes = (function() {
         @return {String} encoded as specified by the parameter
     */
 
+
     Aes.prototype.decryptHexToText = function decryptHexToText(cipher) {
-        var encoding =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "binary";
+        var encoding = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'binary';
 
         return this.decryptHexToBuffer(cipher).toString(encoding);
     };
@@ -296,6 +265,7 @@ var Aes = (function() {
         @return {String} hex
     */
 
+
     Aes.prototype.encryptHex = function encryptHex(plainhex) {
         var plain_array = encHex.parse(plainhex);
         var cipher_array = this._encrypt_word_array(plain_array);
@@ -303,6 +273,6 @@ var Aes = (function() {
     };
 
     return Aes;
-})();
+}();
 
 export default Aes;

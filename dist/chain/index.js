@@ -39,9 +39,7 @@ var _AccountLogin = require("./src/AccountLogin");
 
 var _AccountLogin2 = _interopRequireDefault(_AccountLogin);
 
-function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {default: obj};
-}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var FetchChainObjects = _ChainStore2.default.FetchChainObjects,
     FetchChain = _ChainStore2.default.FetchChain;

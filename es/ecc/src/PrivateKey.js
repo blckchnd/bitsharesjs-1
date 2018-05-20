@@ -1,23 +1,20 @@
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-import ecurve from "ecurve";
-import {Point, getCurveByName} from "ecurve";
-import BigInteger from "bigi";
-import {encode, decode} from "bs58";
-import {sha256, sha512} from "./hash";
-import PublicKey from "./PublicKey";
+import ecurve from 'ecurve';
+import { Point, getCurveByName } from 'ecurve';
+import BigInteger from 'bigi';
+import { encode, decode } from 'bs58';
+import { sha256, sha512 } from './hash';
+import PublicKey from './PublicKey';
 import deepEqual from "deep-equal";
 import assert from "assert";
 
-var secp256k1 = getCurveByName("secp256k1");
+var secp256k1 = getCurveByName('secp256k1');
 var G = secp256k1.G,
     n = secp256k1.n;
 
-var PrivateKey = (function() {
+var PrivateKey = function () {
+
     /**
         @private see static functions
         @param {BigInteger}
@@ -33,12 +30,7 @@ var PrivateKey = (function() {
             throw new Error("Expecting paramter to be a Buffer type");
         }
         if (32 !== buf.length) {
-            console.log(
-                "WARN: Expecting 32 bytes, instead got " +
-                    buf.length +
-                    ", stack trace:",
-                new Error().stack
-            );
+            console.log('WARN: Expecting 32 bytes, instead got ' + buf.length + ', stack trace:', new Error().stack);
         }
         if (buf.length === 0) {
             throw new Error("Empty buffer");
@@ -48,24 +40,22 @@ var PrivateKey = (function() {
 
     /** @arg {string} seed - any length string.  This is private, the same seed produces the same private key every time.  */
 
+
     PrivateKey.fromSeed = function fromSeed(seed) {
         // generate_private_key
-        if (!(typeof seed === "string")) {
-            throw new Error("seed must be of type string");
+        if (!(typeof seed === 'string')) {
+            throw new Error('seed must be of type string');
         }
         return PrivateKey.fromBuffer(sha256(seed));
     };
 
     /** @return {string} Wallet Import Format (still a secret, Not encrypted) */
 
+
     PrivateKey.fromWif = function fromWif(_private_wif) {
         var private_wif = new Buffer(decode(_private_wif));
         var version = private_wif.readUInt8(0);
-        assert.equal(
-            0x80,
-            version,
-            "Expected version " + 0x80 + ", instead got " + version
-        );
+        assert.equal(0x80, version, 'Expected version ' + 0x80 + ', instead got ' + version);
         // checksum includes the version
         var private_key = private_wif.slice(0, -4);
         var checksum = private_wif.slice(-4);
@@ -95,16 +85,17 @@ var PrivateKey = (function() {
         @return {Point}
     */
 
+
     PrivateKey.prototype.toPublicKeyPoint = function toPublicKeyPoint() {
         var Q;
-        return (Q = secp256k1.G.multiply(this.d));
+        return Q = secp256k1.G.multiply(this.d);
     };
 
     PrivateKey.prototype.toPublicKey = function toPublicKey() {
         if (this.public_key) {
             return this.public_key;
         }
-        return (this.public_key = PublicKey.fromPoint(this.toPublicKeyPoint()));
+        return this.public_key = PublicKey.fromPoint(this.toPublicKeyPoint());
     };
 
     PrivateKey.prototype.toBuffer = function toBuffer() {
@@ -113,24 +104,18 @@ var PrivateKey = (function() {
 
     /** ECIES */
 
-    PrivateKey.prototype.get_shared_secret = function get_shared_secret(
-        public_key
-    ) {
-        var legacy =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : false;
+
+    PrivateKey.prototype.get_shared_secret = function get_shared_secret(public_key) {
+        var legacy = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
         public_key = toPublic(public_key);
         var KB = public_key.toUncompressed().toBuffer();
-        var KBP = Point.fromAffine(
-            secp256k1,
-            BigInteger.fromBuffer(KB.slice(1, 33)), // x
-            BigInteger.fromBuffer(KB.slice(33, 65)) // y
+        var KBP = Point.fromAffine(secp256k1, BigInteger.fromBuffer(KB.slice(1, 33)), // x
+        BigInteger.fromBuffer(KB.slice(33, 65)) // y
         );
         var r = this.toBuffer();
         var P = KBP.multiply(BigInteger.fromBuffer(r));
-        var S = P.affineX.toBuffer({size: 32});
+        var S = P.affineX.toBuffer({ size: 32 });
         /*
         the input to sha512 must be exactly 32-bytes, to match the c++ implementation
         of get_shared_secret.  Right now S will be shorter if the most significant
@@ -156,20 +141,17 @@ var PrivateKey = (function() {
 
     /** @throws {Error} - overflow of the key could not be derived */
 
+
     PrivateKey.prototype.child = function child(offset) {
         offset = Buffer.concat([this.toPublicKey().toBuffer(), offset]);
         offset = sha256(offset);
         var c = BigInteger.fromBuffer(offset);
 
-        if (c.compareTo(n) >= 0)
-            throw new Error("Child offset went out of bounds, try again");
+        if (c.compareTo(n) >= 0) throw new Error("Child offset went out of bounds, try again");
 
         var derived = this.d.add(c); //.mod(n)
 
-        if (derived.signum() === 0)
-            throw new Error(
-                "Child offset derived to an invalid key, try again"
-            );
+        if (derived.signum() === 0) throw new Error("Child offset derived to an invalid key, try again");
 
         return new PrivateKey(derived);
     };
@@ -177,33 +159,27 @@ var PrivateKey = (function() {
     /* <helper_functions> */
 
     PrivateKey.prototype.toByteBuffer = function toByteBuffer() {
-        var b = new ByteBuffer(
-            ByteBuffer.DEFAULT_CAPACITY,
-            ByteBuffer.LITTLE_ENDIAN
-        );
+        var b = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN);
         this.appendByteBuffer(b);
         return b.copy(0, b.offset);
     };
 
     PrivateKey.fromHex = function fromHex(hex) {
-        return PrivateKey.fromBuffer(new Buffer(hex, "hex"));
+        return PrivateKey.fromBuffer(new Buffer(hex, 'hex'));
     };
 
     PrivateKey.prototype.toHex = function toHex() {
-        return this.toBuffer().toString("hex");
+        return this.toBuffer().toString('hex');
     };
 
     /* </helper_functions> */
 
+
     return PrivateKey;
-})();
+}();
 
 export default PrivateKey;
 
 var toPublic = function toPublic(data) {
-    return data == null
-        ? data
-        : data.Q
-            ? data
-            : PublicKey.fromStringOrThrow(data);
+    return data == null ? data : data.Q ? data : PublicKey.fromStringOrThrow(data);
 };

@@ -1,15 +1,11 @@
-function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-import ByteBuffer from "bytebuffer";
-import EC from "./error_with_cause";
+import ByteBuffer from 'bytebuffer';
+import EC from './error_with_cause';
 
 var HEX_DUMP = process.env.npm_config__graphene_serializer_hex_dump;
 
-var Serializer = (function() {
+var Serializer = function () {
     function Serializer(operation_name, types) {
         _classCallCheck(this, Serializer);
 
@@ -39,38 +35,26 @@ var Serializer = (function() {
                             b.offset = o1;
                             //b.reset()
                             var _b = b.copy(o1, o2);
-                            console.error(
-                                this.operation_name + "." + field + "\t",
-                                _b.toHex()
-                            );
+                            console.error(this.operation_name + '.' + field + '\t', _b.toHex());
                         }
                     }
                     object[field] = type.fromByteBuffer(b);
                 } catch (e) {
                     if (Serializer.printDebug) {
-                        console.error(
-                            "Error reading " +
-                                this.operation_name +
-                                "." +
-                                field +
-                                " in data:"
-                        );
+                        console.error('Error reading ' + this.operation_name + '.' + field + ' in data:');
                         b.printDebug();
                     }
                     throw e;
                 }
             }
         } catch (error) {
-            EC.throw(this.operation_name + "." + field, error);
+            EC.throw(this.operation_name + '.' + field, error);
         }
 
         return object;
     };
 
-    Serializer.prototype.appendByteBuffer = function appendByteBuffer(
-        b,
-        object
-    ) {
+    Serializer.prototype.appendByteBuffer = function appendByteBuffer(b, object) {
         var field = null;
         try {
             var iterable = this.keys;
@@ -81,20 +65,10 @@ var Serializer = (function() {
             }
         } catch (error) {
             try {
-                EC.throw(
-                    this.operation_name +
-                        "." +
-                        field +
-                        " = " +
-                        JSON.stringify(object[field]),
-                    error
-                );
+                EC.throw(this.operation_name + '.' + field + " = " + JSON.stringify(object[field]), error);
             } catch (e) {
                 // circular ref
-                EC.throw(
-                    this.operation_name + "." + field + " = " + object[field],
-                    error
-                );
+                EC.throw(this.operation_name + '.' + field + " = " + object[field], error);
             }
         }
         return;
@@ -115,7 +89,7 @@ var Serializer = (function() {
                 result[field] = object;
             }
         } catch (error) {
-            EC.throw(this.operation_name + "." + field, error);
+            EC.throw(this.operation_name + '.' + field, error);
         }
 
         return result;
@@ -126,15 +100,10 @@ var Serializer = (function() {
         @arg {boolean} [debug.annotate = false] - add user-friendly information
     */
 
+
     Serializer.prototype.toObject = function toObject() {
-        var serialized_object =
-            arguments.length > 0 && arguments[0] !== undefined
-                ? arguments[0]
-                : {};
-        var debug =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {use_default: false, annotate: false};
+        var serialized_object = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { use_default: false, annotate: false };
 
         var result = {};
         var field = null;
@@ -145,32 +114,17 @@ var Serializer = (function() {
             for (var i = 0, field; i < iterable.length; i++) {
                 field = iterable[i];
                 var type = this.types[field];
-                var object = type.toObject(
-                    typeof serialized_object !== "undefined" &&
-                    serialized_object !== null
-                        ? serialized_object[field]
-                        : undefined,
-                    debug
-                );
+                var object = type.toObject(typeof serialized_object !== "undefined" && serialized_object !== null ? serialized_object[field] : undefined, debug);
                 result[field] = object;
                 if (HEX_DUMP) {
-                    var b = new ByteBuffer(
-                        ByteBuffer.DEFAULT_CAPACITY,
-                        ByteBuffer.LITTLE_ENDIAN
-                    );
-                    type.appendByteBuffer(
-                        b,
-                        typeof serialized_object !== "undefined" &&
-                        serialized_object !== null
-                            ? serialized_object[field]
-                            : undefined
-                    );
+                    var b = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN);
+                    type.appendByteBuffer(b, typeof serialized_object !== "undefined" && serialized_object !== null ? serialized_object[field] : undefined);
                     b = b.copy(0, b.offset);
-                    console.error(this.operation_name + "." + field, b.toHex());
+                    console.error(this.operation_name + '.' + field, b.toHex());
                 }
             }
         } catch (error) {
-            EC.throw(this.operation_name + "." + field, error);
+            EC.throw(this.operation_name + '.' + field, error);
         }
 
         return result;
@@ -178,7 +132,9 @@ var Serializer = (function() {
 
     /** Sort by the first element in a operation */
 
+
     Serializer.prototype.compare = function compare(a, b) {
+
         var first_key = this.keys[0];
         var first_type = this.types[first_key];
 
@@ -187,8 +143,7 @@ var Serializer = (function() {
 
         if (first_type.compare) return first_type.compare(valA, valB);
 
-        if (typeof valA === "number" && typeof valB === "number")
-            return valA - valB;
+        if (typeof valA === "number" && typeof valB === "number") return valA - valB;
 
         var encoding = void 0;
         if (Buffer.isBuffer(valA) && Buffer.isBuffer(valB)) {
@@ -209,10 +164,7 @@ var Serializer = (function() {
     };
 
     Serializer.prototype.fromBuffer = function fromBuffer(buffer) {
-        var b = ByteBuffer.fromBinary(
-            buffer.toString("binary"),
-            ByteBuffer.LITTLE_ENDIAN
-        );
+        var b = ByteBuffer.fromBinary(buffer.toString("binary"), ByteBuffer.LITTLE_ENDIAN);
         return this.fromByteBuffer(b);
     };
 
@@ -223,19 +175,16 @@ var Serializer = (function() {
     };
 
     Serializer.prototype.toByteBuffer = function toByteBuffer(object) {
-        var b = new ByteBuffer(
-            ByteBuffer.DEFAULT_CAPACITY,
-            ByteBuffer.LITTLE_ENDIAN
-        );
+        var b = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN);
         this.appendByteBuffer(b, object);
         return b.copy(0, b.offset);
     };
 
     Serializer.prototype.toBuffer = function toBuffer(object) {
-        return new Buffer(this.toByteBuffer(object).toBinary(), "binary");
+        return new Buffer(this.toByteBuffer(object).toBinary(), 'binary');
     };
 
     return Serializer;
-})();
+}();
 
 export default Serializer;

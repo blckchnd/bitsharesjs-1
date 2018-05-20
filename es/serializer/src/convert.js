@@ -1,6 +1,7 @@
-import ByteBuffer from "bytebuffer";
+import ByteBuffer from 'bytebuffer';
 
-export default function(type) {
+export default function (type) {
+
     return {
         fromHex: function fromHex(hex) {
             var b = ByteBuffer.fromHex(hex, ByteBuffer.LITTLE_ENDIAN);
@@ -11,14 +12,11 @@ export default function(type) {
             return b.toHex();
         },
         fromBuffer: function fromBuffer(buffer) {
-            var b = ByteBuffer.fromBinary(
-                buffer.toString(),
-                ByteBuffer.LITTLE_ENDIAN
-            );
+            var b = ByteBuffer.fromBinary(buffer.toString(), ByteBuffer.LITTLE_ENDIAN);
             return type.fromByteBuffer(b);
         },
         toBuffer: function toBuffer(object) {
-            return new Buffer(toByteBuffer(type, object).toBinary(), "binary");
+            return new Buffer(toByteBuffer(type, object).toBinary(), 'binary');
         },
         fromBinary: function fromBinary(string) {
             var b = ByteBuffer.fromBinary(string, ByteBuffer.LITTLE_ENDIAN);
@@ -28,13 +26,10 @@ export default function(type) {
             return toByteBuffer(type, object).toBinary();
         }
     };
-}
+};
 
 var toByteBuffer = function toByteBuffer(type, object) {
-    var b = new ByteBuffer(
-        ByteBuffer.DEFAULT_CAPACITY,
-        ByteBuffer.LITTLE_ENDIAN
-    );
+    var b = new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, ByteBuffer.LITTLE_ENDIAN);
     type.appendByteBuffer(b, object);
     return b.copy(0, b.offset);
 };

@@ -2,19 +2,7 @@
 
 exports.__esModule = true;
 
-var _typeof =
-    typeof Symbol === "function" && typeof Symbol.iterator === "symbol"
-        ? function(obj) {
-              return typeof obj;
-          }
-        : function(obj) {
-              return obj &&
-                  typeof Symbol === "function" &&
-                  obj.constructor === Symbol &&
-                  obj !== Symbol.prototype
-                  ? "symbol"
-                  : typeof obj;
-          };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _bytebuffer = require("bytebuffer");
 
@@ -22,9 +10,7 @@ var _ChainTypes = require("../../chain/src/ChainTypes");
 
 var _ChainTypes2 = _interopRequireDefault(_ChainTypes);
 
-function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {default: obj};
-}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var MAX_SAFE_INT = 9007199254740991;
 var MIN_SAFE_INT = -9007199254740991;
@@ -40,10 +26,7 @@ var _my = {
     },
 
     required: function required(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
         if (this.is_empty(value)) {
             throw new Error("value required " + field_name + " " + value);
@@ -51,10 +34,7 @@ var _my = {
         return value;
     },
     require_long: function require_long(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
         if (!_bytebuffer.Long.isLong(value)) {
             throw new Error("Long value required " + field_name + " " + value);
@@ -80,26 +60,18 @@ var _my = {
         return value;
     },
     whole_number: function whole_number(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
         if (this.is_empty(value)) {
             return value;
         }
         if (/\./.test(value)) {
-            throw new Error(
-                "whole number required " + field_name + " " + value
-            );
+            throw new Error("whole number required " + field_name + " " + value);
         }
         return value;
     },
     unsigned: function unsigned(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
         if (this.is_empty(value)) {
             return value;
@@ -110,42 +82,35 @@ var _my = {
         return value;
     },
 
+
     is_digits: function is_digits(value) {
         if (typeof value === "numeric") {
             return true;
         }
-        return /^[0-9]+$/.test(value);
+        return (/^[0-9]+$/.test(value)
+        );
     },
 
     to_number: function to_number(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
         if (this.is_empty(value)) {
             return value;
         }
         this.no_overflow53(value, field_name);
-        var int_value = (function() {
+        var int_value = function () {
             if (typeof value === "number") {
                 return value;
             } else {
                 return parseInt(value);
             }
-        })();
+        }();
         return int_value;
     },
 
     to_long: function to_long(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
-        var unsigned =
-            arguments.length > 2 && arguments[2] !== undefined
-                ? arguments[2]
-                : false;
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+        var unsigned = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
         if (this.is_empty(value)) {
             return value;
@@ -161,10 +126,7 @@ var _my = {
         return _bytebuffer.Long.fromString(value, unsigned);
     },
     to_string: function to_string(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
         if (this.is_empty(value)) {
             return value;
@@ -179,115 +141,74 @@ var _my = {
         if (_bytebuffer.Long.isLong(value)) {
             return value.toString();
         }
-        throw "unsupported type " +
-            field_name +
-            ": (" +
-            (typeof value === "undefined" ? "undefined" : _typeof(value)) +
-            ") " +
-            value;
+        throw "unsupported type " + field_name + ": (" + (typeof value === "undefined" ? "undefined" : _typeof(value)) + ") " + value;
     },
     require_test: function require_test(regex, value) {
-        var field_name =
-            arguments.length > 2 && arguments[2] !== undefined
-                ? arguments[2]
-                : "";
+        var field_name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
 
         if (this.is_empty(value)) {
             return value;
         }
         if (!regex.test(value)) {
-            throw new Error(
-                "unmatched " + regex + " " + field_name + " " + value
-            );
+            throw new Error("unmatched " + regex + " " + field_name + " " + value);
         }
         return value;
     },
 
+
     require_match: function require_match(regex, value) {
-        var field_name =
-            arguments.length > 2 && arguments[2] !== undefined
-                ? arguments[2]
-                : "";
+        var field_name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
 
         if (this.is_empty(value)) {
             return value;
         }
         var match = value.match(regex);
         if (match === null) {
-            throw new Error(
-                "unmatched " + regex + " " + field_name + " " + value
-            );
+            throw new Error("unmatched " + regex + " " + field_name + " " + value);
         }
         return match;
     },
 
     require_object_id: function require_object_id(value, field_name) {
-        return require_match(
-            /^([0-9]+)\.([0-9]+)\.([0-9]+)$/,
-            value,
-            field_name
-        );
+        return require_match(/^([0-9]+)\.([0-9]+)\.([0-9]+)$/, value, field_name);
     },
 
     // Does not support over 53 bits
     require_range: function require_range(min, max, value) {
-        var field_name =
-            arguments.length > 3 && arguments[3] !== undefined
-                ? arguments[3]
-                : "";
+        var field_name = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
 
         if (this.is_empty(value)) {
             return value;
         }
         var number = this.to_number(value);
         if (value < min || value > max) {
-            throw new Error(
-                "out of range " + value + " " + field_name + " " + value
-            );
+            throw new Error("out of range " + value + " " + field_name + " " + value);
         }
         return value;
     },
 
+
     require_object_type: function require_object_type() {
-        var reserved_spaces =
-            arguments.length > 0 && arguments[0] !== undefined
-                ? arguments[0]
-                : 1;
+        var reserved_spaces = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
         var type = arguments[1];
         var value = arguments[2];
-        var field_name =
-            arguments.length > 3 && arguments[3] !== undefined
-                ? arguments[3]
-                : "";
+        var field_name = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
 
         if (this.is_empty(value)) {
             return value;
         }
         var object_type = _ChainTypes2.default.object_type[type];
         if (!object_type) {
-            throw new Error(
-                "Unknown object type " + type + " " + field_name + " " + value
-            );
+            throw new Error("Unknown object type " + type + " " + field_name + " " + value);
         }
         var re = new RegExp(reserved_spaces + "." + object_type + ".[0-9]+$");
         if (!re.test(value)) {
-            throw new Error(
-                "Expecting " +
-                    type +
-                    " in format " +
-                    (reserved_spaces + "." + object_type + ".[0-9]+ ") +
-                    ("instead of " + value + " " + field_name + " " + value)
-            );
+            throw new Error("Expecting " + type + " in format " + (reserved_spaces + "." + object_type + ".[0-9]+ ") + ("instead of " + value + " " + field_name + " " + value));
         }
         return value;
     },
 
-    get_instance: function get_instance(
-        reserve_spaces,
-        type,
-        value,
-        field_name
-    ) {
+    get_instance: function get_instance(reserve_spaces, type, value, field_name) {
         if (this.is_empty(value)) {
             return value;
         }
@@ -295,20 +216,12 @@ var _my = {
         return this.to_number(value.split(".")[2]);
     },
 
-    require_relative_type: function require_relative_type(
-        type,
-        value,
-        field_name
-    ) {
+    require_relative_type: function require_relative_type(type, value, field_name) {
         this.require_object_type(0, type, value, field_name);
         return value;
     },
 
-    get_relative_instance: function get_relative_instance(
-        type,
-        value,
-        field_name
-    ) {
+    get_relative_instance: function get_relative_instance(type, value, field_name) {
         if (this.is_empty(value)) {
             return value;
         }
@@ -316,20 +229,12 @@ var _my = {
         return this.to_number(value.split(".")[2]);
     },
 
-    require_protocol_type: function require_protocol_type(
-        type,
-        value,
-        field_name
-    ) {
+    require_protocol_type: function require_protocol_type(type, value, field_name) {
         this.require_object_type(1, type, value, field_name);
         return value;
     },
 
-    get_protocol_instance: function get_protocol_instance(
-        type,
-        value,
-        field_name
-    ) {
+    get_protocol_instance: function get_protocol_instance(type, value, field_name) {
         if (this.is_empty(value)) {
             return value;
         }
@@ -354,20 +259,13 @@ var _my = {
         return Object.keys(_ChainTypes2.default.object_type)[type_id];
     },
 
-    require_implementation_type: function require_implementation_type(
-        type,
-        value,
-        field_name
-    ) {
+
+    require_implementation_type: function require_implementation_type(type, value, field_name) {
         this.require_object_type(2, type, value, field_name);
         return value;
     },
 
-    get_implementation_instance: function get_implementation_instance(
-        type,
-        value,
-        field_name
-    ) {
+    get_implementation_instance: function get_implementation_instance(type, value, field_name) {
         if (this.is_empty(value)) {
             return value;
         }
@@ -377,10 +275,7 @@ var _my = {
 
     // signed / unsigned decimal
     no_overflow53: function no_overflow53(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
         if (typeof value === "number") {
             if (value > MAX_SAFE_INT || value < MIN_SAFE_INT) {
@@ -400,24 +295,14 @@ var _my = {
             this.no_overflow53(value.toInt(), field_name);
             return;
         }
-        throw "unsupported type " +
-            field_name +
-            ": (" +
-            (typeof value === "undefined" ? "undefined" : _typeof(value)) +
-            ") " +
-            value;
+        throw "unsupported type " + field_name + ": (" + (typeof value === "undefined" ? "undefined" : _typeof(value)) + ") " + value;
     },
+
 
     // signed / unsigned whole numbers only
     no_overflow64: function no_overflow64(value) {
-        var field_name =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : "";
-        var unsigned =
-            arguments.length > 2 && arguments[2] !== undefined
-                ? arguments[2]
-                : false;
+        var field_name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+        var unsigned = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
         // https://github.com/dcodeIO/Long.js/issues/20
         if (_bytebuffer.Long.isLong(value)) {
@@ -444,10 +329,7 @@ var _my = {
             if (value === "") {
                 value = "0";
             }
-            var long_string = _bytebuffer.Long.fromString(
-                value,
-                unsigned
-            ).toString();
+            var long_string = _bytebuffer.Long.fromString(value, unsigned).toString();
             if (long_string !== value.trim()) {
                 throw new Error("overflow " + field_name + " " + value);
             }
@@ -460,12 +342,7 @@ var _my = {
             return;
         }
 
-        throw "unsupported type " +
-            field_name +
-            ": (" +
-            (typeof value === "undefined" ? "undefined" : _typeof(value)) +
-            ") " +
-            value;
+        throw "unsupported type " + field_name + ": (" + (typeof value === "undefined" ? "undefined" : _typeof(value)) + ") " + value;
     }
 };
 
